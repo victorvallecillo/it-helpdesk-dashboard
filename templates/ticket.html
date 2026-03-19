@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Ticket #{{ ticket.id }} — IT Helpdesk</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #F0F4F8; color: #1a1a1a; font-size: 14px; }
+  nav { background: #1B2A4A; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; height: 52px; }
+  .nav-brand { color: #fff; font-weight: 700; font-size: 16px; } .nav-brand span { color: #60A5FA; }
+  .nav-links a { color: #94A3B8; text-decoration: none; font-size: 13px; margin-left: 20px; }
+  .nav-links a:hover { color: #fff; }
+  main { max-width: 900px; margin: 24px auto; padding: 0 16px; display: grid; grid-template-columns: 1fr 280px; gap: 16px; }
+  .card { background: #fff; border-radius: 10px; padding: 24px; border: 0.5px solid #E2E8F0; margin-bottom: 16px; }
+  h1 { font-size: 18px; font-weight: 700; color: #1B2A4A; margin-bottom: 8px; }
+  .meta { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
+  .badge { display: inline-block; padding: 2px 9px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+  .badge-open{background:#DBEAFE;color:#1D4ED8} .badge-progress{background:#FEF3C7;color:#92400E}
+  .badge-resolved{background:#DCFCE7;color:#166534} .badge-closed{background:#F1F5F9;color:#475569}
+  .badge-critical{background:#FEE2E2;color:#991B1B} .badge-high{background:#FFEDD5;color:#9A3412}
+  .badge-medium{background:#FEF9C3;color:#854D0E} .badge-low{background:#F0FDF4;color:#166534}
+  .description { color: #374151; line-height: 1.6; background: #F8FAFC; border-radius: 6px; padding: 14px; font-size: 13px; }
+  h2 { font-size: 14px; font-weight: 600; color: #1B2A4A; margin-bottom: 14px; }
+  .comment { border-left: 3px solid #E2E8F0; padding-left: 14px; margin-bottom: 14px; }
+  .comment-meta { font-size: 12px; color: #94A3B8; margin-bottom: 4px; }
+  .comment-meta strong { color: #475569; }
+  .comment-body { font-size: 13px; color: #374151; line-height: 1.5; }
+  textarea, input, select { width: 100%; border: 1px solid #E2E8F0; border-radius: 6px; padding: 8px 10px; font-size: 13px; font-family: inherit; color: #1a1a1a; background: #F8FAFC; outline: none; margin-bottom: 10px; }
+  textarea:focus, input:focus, select:focus { border-color: #2563B0; }
+  textarea { min-height: 80px; resize: vertical; }
+  .btn { border: none; border-radius: 6px; padding: 8px 16px; font-size: 13px; font-weight: 600; cursor: pointer; }
+  .btn-primary { background: #2563B0; color: #fff; } .btn-primary:hover { background: #1D4ED8; }
+  .btn-secondary { background: #F1F5F9; color: #64748B; } .btn-secondary:hover { background: #E2E8F0; }
+  .field-row { margin-bottom: 12px; }
+  .field-label { font-size: 11px; font-weight: 600; color: #94A3B8; text-transform: uppercase; letter-spacing: .4px; margin-bottom: 4px; }
+  .field-value { font-size: 13px; color: #374151; }
+  .flash { padding: 10px 16px; border-radius: 8px; margin-bottom: 16px; font-size: 13px; font-weight: 500; }
+  .flash-success { background: #DCFCE7; color: #166534; }
+  .back-link { color: #64748B; text-decoration: none; font-size: 13px; display: inline-block; margin-bottom: 16px; }
+  .back-link:hover { color: #2563B0; }
+</style>
+</head>
+<body>
+<nav>
+  <div class="nav-brand">IT <span>Helpdesk</span></div>
+  <div class="nav-links">
+    <a href="/">Dashboard</a>
+    <a href="/ticket/new" style="background:#2563B0;color:#fff;padding:5px 12px;border-radius:6px">+ New Ticket</a>
+  </div>
+</nav>
+
+<main>
+  <div>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for cat, msg in messages %}
+        <div class="flash flash-{{ cat }}">{{ msg }}</div>
+      {% endfor %}
+    {% endwith %}
+
+    <a href="/" class="back-link">← Back to Dashboard</a>
+
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div>
+          <h1>{{ ticket.title }}</h1>
+          <div class="meta">
+            <span style="color:#94A3B8;font-size:12px">#{{ ticket.id }}</span>
+            {% set s = ticket.status %}
+            {% if s == 'Open' %}<span class="badge badge-open">Open</span>
+            {% elif s == 'In Progress' %}<span class="badge badge-progress">In Progress</span>
+            {% elif s == 'Resolved' %}<span class="badge badge-resolved">Resolved</span>
+            {% else %}<span class="badge badge-closed">{{ s }}</span>{% endif %}
+            {% set p = ticket.priority %}
+            <span class="badge badge-{{ p.lower() }}">{{ p }}</span>
+            <span style="background:#F1F5F9;color:#475569;font-size:11px;padding:2px 9px;border-radius:12px">{{ ticket.category }}</span>
+          </div>
+        </div>
+      </div>
+      <div class="description">{{ ticket.description }}</div>
+    </div>
+
+    <!-- Comments -->
+    <div class="card">
+      <h2>Activity ({{ comments|length }})</h2>
+      {% if comments %}
+        {% for c in comments %}
+        <div class="comment">
+          <div class="comment-meta"><strong>{{ c.author }}</strong> &nbsp;·&nbsp; {{ c.created_at }}</div>
+          <div class="comment-body">{{ c.body }}</div>
+        </div>
+        {% endfor %}
+      {% else %}
+        <p style="color:#94A3B8;font-size:13px">No comments yet.</p>
+      {% endif %}
+
+      <form method="post" action="/ticket/{{ ticket.id }}/comment" style="margin-top:20px;border-top:1px solid #F1F5F9;padding-top:16px">
+        <input type="text" name="author" placeholder="Your name" required>
+        <textarea name="body" placeholder="Add a comment or update..." required></textarea>
+        <button type="submit" class="btn btn-primary">Add Comment</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Sidebar -->
+  <div>
+    <div class="card">
+      <h2>Update Ticket</h2>
+      <form method="post" action="/ticket/{{ ticket.id }}/update">
+        <div class="field-label">Status</div>
+        <select name="status">
+          {% for s in ['Open','In Progress','Resolved','Closed'] %}
+            <option value="{{ s }}" {% if ticket.status == s %}selected{% endif %}>{{ s }}</option>
+          {% endfor %}
+        </select>
+        <div class="field-label">Priority</div>
+        <select name="priority">
+          {% for p in ['Low','Medium','High','Critical'] %}
+            <option value="{{ p }}" {% if ticket.priority == p %}selected{% endif %}>{{ p }}</option>
+          {% endfor %}
+        </select>
+        <div class="field-label">Assigned To</div>
+        <input type="text" name="assigned_to" value="{{ ticket.assigned_to }}">
+        <button type="submit" class="btn btn-primary" style="width:100%">Update</button>
+      </form>
+    </div>
+
+    <div class="card">
+      <h2>Details</h2>
+      <div class="field-row"><div class="field-label">Requester</div><div class="field-value">{{ ticket.requester }}</div></div>
+      <div class="field-row"><div class="field-label">Category</div><div class="field-value">{{ ticket.category }}</div></div>
+      <div class="field-row"><div class="field-label">Created</div><div class="field-value">{{ ticket.created_at }}</div></div>
+      <div class="field-row"><div class="field-label">Last Updated</div><div class="field-value">{{ ticket.updated_at }}</div></div>
+      {% if ticket.resolved_at %}
+      <div class="field-row"><div class="field-label">Resolved</div><div class="field-value">{{ ticket.resolved_at }}</div></div>
+      {% endif %}
+    </div>
+  </div>
+</main>
+</body>
+</html>

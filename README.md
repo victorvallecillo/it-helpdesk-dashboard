@@ -1,10 +1,10 @@
 # 🎫 IT Helpdesk Dashboard
 
-A lightweight, production-inspired IT ticketing system built with Python and Flask. Designed to demonstrate real helpdesk workflow management — creating, assigning, tracking, and resolving IT support tickets.
+A small local ticketing demo built with Python and Flask. It lets you practice common service desk workflows: creating, assigning, updating, and resolving support tickets.
 
-> **Author:** Victor Vallecillo — IT Support Specialist | Google IT Support Certified | CS50 Harvard  
+> **Portfolio project:** IT support workflows · Google IT Support Professional Certificate · CS50 Harvard  
 > **Stack:** Python · Flask · SQLite · HTML/CSS  
-> **Live demo:** Run locally in 2 minutes (see below)
+> **Demo:** Run locally with sample tickets (see below)
 
 ---
 
@@ -24,7 +24,7 @@ A lightweight, production-inspired IT ticketing system built with Python and Fla
 
 ```bash
 # 1. Clone the repo
-git clone https://github.com/YOUR_USERNAME/it-helpdesk-dashboard.git
+git clone https://github.com/victorvallecillo/it-helpdesk-dashboard.git
 cd it-helpdesk-dashboard
 
 # 2. Install dependency
@@ -53,12 +53,43 @@ The database is created automatically on first run with sample tickets pre-loade
 
 ## 🎯 Priority Levels
 
-| Priority | Response Target | Example |
+| Priority | Example target* | Example |
 |---|---|---|
 | Critical | Immediate | Server down, data breach |
 | High | Same day | Multiple users affected, VPN down |
 | Medium | Next business day | Single user issue |
 | Low | This week | Cosmetic issue, low-impact request |
+
+
+
+*These are illustrative targets for the demo, not an SLA. The app does not currently track response timers.*
+
+---
+
+## Practice ticket scenarios
+
+The examples below are fictional exercises for the seeded demo data. They show what a useful ticket can contain; they are not records of real support incidents.
+
+### 1. One user cannot sign in
+
+- **Category / priority:** Access / Medium
+- **Capture:** App, device, exact error, time, and whether other services work. Never record a password or MFA code.
+- **Work through:** Verify identity, check the account and relevant sign-in record, then follow the approved recovery route.
+- **Resolve when:** The user confirms access and the ticket records the checks and outcome.
+
+### 2. New starter is missing Outlook access
+
+- **Category / priority:** Onboarding / Medium
+- **Capture:** Start date, manager, requested access, device, and the exact symptom.
+- **Work through:** Check the account, intended groups and licence, mailbox availability, and managed-device status where relevant.
+- **Resolve when:** The new starter can sign in and open the requested mailbox, or a clear provisioning dependency has been assigned and explained.
+
+### 3. Several users cannot connect to VPN
+
+- **Category / priority:** Network / High
+- **Capture:** Number of affected users, location, connection type, start time, and any error message.
+- **Work through:** Check whether the issue is shared, record affected scope, provide updates, and escalate to the network owner when needed.
+- **Resolve when:** Affected users confirm access is restored and the ticket records the scope, escalation, and verification.
 
 ---
 
@@ -114,4 +145,4 @@ it-helpdesk-dashboard/
 
 ---
 
-*Built as part of a hands-on IT portfolio alongside [homelab-infrastructure](https://github.com/YOUR_USERNAME/homelab-infrastructure) and [m365-admin-lab](https://github.com/YOUR_USERNAME/m365-admin-lab).*
+*Built as part of an IT portfolio alongside [Microsoft 365 Admin Lab](https://github.com/victorvallecillo/m365-admin-lab).*

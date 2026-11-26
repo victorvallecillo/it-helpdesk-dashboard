@@ -68,28 +68,19 @@ The database is created automatically on first run with sample tickets pre-loade
 
 ## Practice ticket scenarios
 
-The examples below are fictional exercises for the seeded demo data. They show what a useful ticket can contain; they are not records of real support incidents.
+Try these with the sample data. They are practice examples, not real support tickets.
 
-### 1. One user cannot sign in
+### Outlook sign-in problem · Access / Medium
 
-- **Category / priority:** Access / Medium
-- **Capture:** App, device, exact error, time, and whether other services work. Never record a password or MFA code.
-- **Work through:** Verify identity, check the account and relevant sign-in record, then follow the approved recovery route.
-- **Resolve when:** The user confirms access and the ticket records the checks and outcome.
+Note the app, device, error, and time. Verify the user, check the account and sign-in record, then confirm they can get in before closing the ticket.
 
-### 2. New starter is missing Outlook access
+### New starter can't open Outlook · Onboarding / Medium
 
-- **Category / priority:** Onboarding / Medium
-- **Capture:** Start date, manager, requested access, device, and the exact symptom.
-- **Work through:** Check the account, intended groups and licence, mailbox availability, and managed-device status where relevant.
-- **Resolve when:** The new starter can sign in and open the requested mailbox, or a clear provisioning dependency has been assigned and explained.
+Record the start date and requested access. Check the account, group and licence assignment, mailbox, and managed device if there is one. If provisioning is still pending, say what is outstanding and who will follow up.
 
-### 3. Several users cannot connect to VPN
+### VPN unavailable for several users · Network / High
 
-- **Category / priority:** Network / High
-- **Capture:** Number of affected users, location, connection type, start time, and any error message.
-- **Work through:** Check whether the issue is shared, record affected scope, provide updates, and escalate to the network owner when needed.
-- **Resolve when:** Affected users confirm access is restored and the ticket records the scope, escalation, and verification.
+Record how many people are affected, where they are, and when the problem started. Check whether the issue is shared, keep users updated, and escalate to the network owner. Close after access is restored and confirmed.
 
 ---
 

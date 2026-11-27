@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Ticket #{{ ticket.id }} — IT Helpdesk</title>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -32,13 +33,18 @@
   .btn-primary { background: #2563B0; color: #fff; } .btn-primary:hover { background: #1D4ED8; }
   .btn-secondary { background: #F1F5F9; color: #64748B; } .btn-secondary:hover { background: #E2E8F0; }
   .field-row { margin-bottom: 12px; }
-  .field-label { font-size: 11px; font-weight: 600; color: #94A3B8; text-transform: uppercase; letter-spacing: .4px; margin-bottom: 4px; }
+  .field-label { display: block; font-size: 11px; font-weight: 600; color: #94A3B8; text-transform: uppercase; letter-spacing: .4px; margin-bottom: 4px; }
   .field-value { font-size: 13px; color: #374151; }
   .flash { padding: 10px 16px; border-radius: 8px; margin-bottom: 16px; font-size: 13px; font-weight: 500; }
   .flash-success { background: #DCFCE7; color: #166534; }
   .flash-danger { background: #FEE2E2; color: #991B1B; }
   .back-link { color: #64748B; text-decoration: none; font-size: 13px; display: inline-block; margin-bottom: 16px; }
   .back-link:hover { color: #2563B0; }
+  @media (max-width: 680px) {
+    nav { padding: 0 16px; }
+    main { grid-template-columns: 1fr; gap: 0; margin: 18px auto; }
+    .card { padding: 18px; }
+  }
 </style>
 </head>
 <body>
@@ -95,8 +101,10 @@
       {% endif %}
 
       <form method="post" action="/ticket/{{ ticket.id }}/comment" style="margin-top:20px;border-top:1px solid #F1F5F9;padding-top:16px">
-        <input type="text" name="author" maxlength="100" placeholder="Your name" required>
-        <textarea name="body" maxlength="2000" placeholder="Add a comment or update..." required></textarea>
+        <label class="field-label" for="comment-author">Your name</label>
+        <input id="comment-author" type="text" name="author" maxlength="100" placeholder="Your name" required>
+        <label class="field-label" for="comment-body">Comment or update</label>
+        <textarea id="comment-body" name="body" maxlength="2000" placeholder="Add a comment or update..." required></textarea>
         <button type="submit" class="btn btn-primary">Add Comment</button>
       </form>
     </div>
@@ -107,20 +115,20 @@
     <div class="card">
       <h2>Update Ticket</h2>
       <form method="post" action="/ticket/{{ ticket.id }}/update">
-        <div class="field-label">Status</div>
-        <select name="status">
+        <label class="field-label" for="ticket-status">Status</label>
+        <select id="ticket-status" name="status">
           {% for s in ['Open','In Progress','Resolved','Closed'] %}
             <option value="{{ s }}" {% if ticket.status == s %}selected{% endif %}>{{ s }}</option>
           {% endfor %}
         </select>
-        <div class="field-label">Priority</div>
-        <select name="priority">
+        <label class="field-label" for="ticket-priority">Priority</label>
+        <select id="ticket-priority" name="priority">
           {% for p in ['Low','Medium','High','Critical'] %}
             <option value="{{ p }}" {% if ticket.priority == p %}selected{% endif %}>{{ p }}</option>
           {% endfor %}
         </select>
-        <div class="field-label">Assigned To</div>
-        <input type="text" name="assigned_to" maxlength="100" value="{{ ticket.assigned_to }}">
+        <label class="field-label" for="assigned-to">Assigned To</label>
+        <input id="assigned-to" type="text" name="assigned_to" maxlength="100" value="{{ ticket.assigned_to }}">
         <button type="submit" class="btn btn-primary" style="width:100%">Update</button>
       </form>
     </div>

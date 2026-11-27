@@ -39,7 +39,7 @@
   .btn-clear { background: #F1F5F9; color: #64748B; border: none; border-radius: 6px; padding: 6px 14px; font-size: 13px; cursor: pointer; text-decoration: none; }
 
   /* ─ Table ─ */
-  .table-wrap { background: #fff; border-radius: 10px; border: 0.5px solid #E2E8F0; overflow: hidden; }
+  .table-wrap { background: #fff; border-radius: 10px; border: 0.5px solid #E2E8F0; overflow-x: auto; }
   .table-header { padding: 14px 20px; border-bottom: 1px solid #F1F5F9; display: flex; justify-content: space-between; align-items: center; }
   .table-header h2 { font-size: 14px; font-weight: 600; color: #1B2A4A; }
   table { width: 100%; border-collapse: collapse; }
@@ -67,6 +67,16 @@
   .flash-danger  { background: #FEE2E2; color: #991B1B; }
 
   .empty { text-align: center; padding: 48px; color: #94A3B8; }
+
+  @media (max-width: 720px) {
+    nav { padding: 0 16px; }
+    main { padding: 18px 12px; }
+    .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+    .metric-card { padding: 12px; }
+    .metric-card .value { font-size: 26px; }
+    .filters input, .filters select, .filters button, .filters .btn-clear { flex: 1 1 140px; }
+    table { min-width: 760px; }
+  }
 </style>
 </head>
 <body>
@@ -112,20 +122,20 @@
 
   <!-- Filters -->
   <form class="filters" method="get">
-    <input type="text" name="q" placeholder="Search tickets..." value="{{ filters.q }}">
-    <select name="status">
+    <input type="text" name="q" aria-label="Search tickets" placeholder="Search tickets..." value="{{ filters.q }}">
+    <select name="status" aria-label="Filter by status">
       <option value="">All Statuses</option>
       {% for s in ['Open','In Progress','Resolved','Closed'] %}
         <option value="{{ s }}" {% if filters.status == s %}selected{% endif %}>{{ s }}</option>
       {% endfor %}
     </select>
-    <select name="priority">
+    <select name="priority" aria-label="Filter by priority">
       <option value="">All Priorities</option>
       {% for p in ['Critical','High','Medium','Low'] %}
         <option value="{{ p }}" {% if filters.priority == p %}selected{% endif %}>{{ p }}</option>
       {% endfor %}
     </select>
-    <select name="category">
+    <select name="category" aria-label="Filter by category">
       <option value="">All Categories</option>
       {% for c in categories %}
         <option value="{{ c }}" {% if filters.category == c %}selected{% endif %}>{{ c }}</option>

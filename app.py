@@ -118,7 +118,7 @@ def index():
         "open":        db.execute("SELECT COUNT(*) FROM tickets WHERE status='Open'").fetchone()[0],
         "in_progress": db.execute("SELECT COUNT(*) FROM tickets WHERE status='In Progress'").fetchone()[0],
         "resolved":    db.execute("SELECT COUNT(*) FROM tickets WHERE status='Resolved'").fetchone()[0],
-        "high":        db.execute("SELECT COUNT(*) FROM tickets WHERE priority IN ('High','Critical') AND status!='Resolved'").fetchone()[0],
+        "high":        db.execute("SELECT COUNT(*) FROM tickets WHERE priority IN ('High','Critical') AND status NOT IN ('Resolved','Closed')").fetchone()[0],
     }
 
     categories = [r[0] for r in db.execute("SELECT DISTINCT category FROM tickets").fetchall()]
@@ -167,7 +167,7 @@ def new_ticket():
 def view_ticket(ticket_id):
     db = get_db()
     ticket   = db.execute("SELECT * FROM tickets WHERE id=?", (ticket_id,)).fetchone()
-    comments = db.execute("SELECT * FROM comments WHERE ticket_id=? ORDER BY created_at", (ticket_id,)).fetchall()
+    comments = db.execute("SELECT * FROM comments WHERE ticket_id=? ORDER BY created_at, id", (ticket_id,)).fetchall()
     if not ticket:
         flash("Ticket not found.", "danger")
         return redirect(url_for("index"))

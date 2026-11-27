@@ -4,9 +4,11 @@ A small local ticketing demo built with Python and Flask. It lets you practice c
 
 > **Portfolio project:** IT support workflows · Google IT Support Professional Certificate · CS50 Harvard  
 > **Stack:** Python · Flask · SQLite · HTML/CSS  
-> **Demo:** Run locally with sample tickets (see below)
+> **Demo:** Local Flask app with sample tickets (see below)
 
 ---
+
+> This app is a local portfolio demo. It has no login or CSRF protection; don't enter real user data or expose it to a network.
 
 ## 📸 Features
 
@@ -36,7 +38,7 @@ python app.py
 # 4. Open http://localhost:5000
 ```
 
-The database is created automatically on first run with sample tickets pre-loaded.
+The database and sample tickets are created automatically on first run. Set `FLASK_SECRET_KEY` if you want a consistent session key between restarts; otherwise a temporary local key is generated.
 
 ---
 
@@ -118,7 +120,7 @@ it-helpdesk-dashboard/
 
 ## 💡 Design Decisions
 
-**Why SQLite?** Zero configuration, zero dependencies beyond Flask. The entire database is a single file — easy to reset, inspect, and version-control for demonstration purposes.
+**Why SQLite?** It keeps setup simple for a local demo. The database is one file and is created automatically on first run.
 
 **Why no JavaScript framework?** Kept deliberately simple to focus on the IT workflow logic rather than frontend complexity. The UI is clean enough to demo professionally without React overhead.
 

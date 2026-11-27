@@ -13,6 +13,9 @@
   .nav-links a:hover { color: #fff; }
   main { max-width: 680px; margin: 32px auto; padding: 0 16px; }
   .card { background: #fff; border-radius: 10px; padding: 28px; border: 0.5px solid #E2E8F0; }
+  .flash { padding: 10px 14px; border-radius: 6px; margin-bottom: 16px; }
+  .flash-success { background: #DCFCE7; color: #166534; }
+  .flash-danger { background: #FEE2E2; color: #991B1B; }
   h1 { font-size: 18px; font-weight: 700; color: #1B2A4A; margin-bottom: 24px; }
   .form-group { margin-bottom: 16px; }
   label { display: block; font-size: 12px; font-weight: 600; color: #475569; margin-bottom: 5px; text-transform: uppercase; letter-spacing: .4px; }
@@ -36,19 +39,24 @@
 <main>
   <div class="card">
     <h1>New Support Ticket</h1>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+        <div class="flash flash-{{ category }}" role="status">{{ message }}</div>
+      {% endfor %}
+    {% endwith %}
     <form method="post">
       <div class="form-group">
-        <label>Title *</label>
-        <input type="text" name="title" required placeholder="Brief description of the issue">
+        <label for="title">Title *</label>
+        <input id="title" type="text" name="title" maxlength="120" required placeholder="Brief description of the issue">
       </div>
       <div class="form-group">
-        <label>Description *</label>
-        <textarea name="description" required placeholder="Detailed description — what happened, when, which device/system, any error messages..."></textarea>
+        <label for="description">Description *</label>
+        <textarea id="description" name="description" maxlength="2000" required placeholder="What happened, when, which device or app, and any error message"></textarea>
       </div>
       <div class="row">
         <div class="form-group">
-          <label>Category</label>
-          <select name="category">
+          <label for="category">Category</label>
+          <select id="category" name="category">
             <option>Hardware</option>
             <option>Software</option>
             <option>Network</option>
@@ -59,8 +67,8 @@
           </select>
         </div>
         <div class="form-group">
-          <label>Priority</label>
-          <select name="priority">
+          <label for="priority">Priority</label>
+          <select id="priority" name="priority">
             <option>Low</option>
             <option selected>Medium</option>
             <option>High</option>
@@ -70,12 +78,12 @@
       </div>
       <div class="row">
         <div class="form-group">
-          <label>Requester *</label>
-          <input type="text" name="requester" required placeholder="Full name or email">
+          <label for="requester">Requester *</label>
+          <input id="requester" type="text" name="requester" maxlength="100" required placeholder="Full name or email">
         </div>
         <div class="form-group">
-          <label>Assign To</label>
-          <input type="text" name="assigned_to" placeholder="Technician name (optional)">
+          <label for="assigned_to">Assign To</label>
+          <input id="assigned_to" type="text" name="assigned_to" maxlength="100" placeholder="Technician name (optional)">
         </div>
       </div>
       <div class="actions">

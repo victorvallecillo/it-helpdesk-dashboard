@@ -18,14 +18,23 @@ import sqlite3
 import os
 
 app = Flask(__name__)
-app.secret_key = "helpdesk-secret-2024"
+app.secret_key = os.environ.get("FLASK_SECRET_KEY") or os.urandom(32)
+app.config.update(
+    MAX_CONTENT_LENGTH=16 * 1024,
+    SESSION_COOKIE_HTTPONLY=True,
+    SESSION_COOKIE_SAMESITE="Lax",
+)
 DB_PATH = "helpdesk.db"
+CATEGORIES = {"Hardware", "Software", "Network", "Access", "Onboarding", "Email", "General"}
+PRIORITIES = {"Low", "Medium", "High", "Critical"}
+STATUSES = {"Open", "In Progress", "Resolved", "Closed"}
 
 # ─── Database ────────────────────────────────────────────────────────────────
 
 def get_db():
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
+    conn.execute("PRAGMA foreign_keys = ON")
     return conn
 
 def init_db():
@@ -123,19 +132,31 @@ def index():
 @app.route("/ticket/new", methods=["GET", "POST"])
 def new_ticket():
     if request.method == "POST":
+        title = request.form.get("title", "").strip()
+        description = request.form.get("description", "").strip()
+        category = request.form.get("category", "")
+        priority = request.form.get("priority", "")
+        requester = request.form.get("requester", "").strip()
+        assigned_to = request.form.get("assigned_to", "").strip() or "Unassigned"
+
+        if (
+            not title or len(title) > 120
+            or not description or len(description) > 2000
+            or not requester or len(requester) > 100
+            or len(assigned_to) > 100
+            or category not in CATEGORIES
+            or priority not in PRIORITIES
+        ):
+            flash("Check the required fields, text lengths, category, and priority.", "danger")
+            return redirect(url_for("new_ticket"))
+
         now = datetime.now().strftime("%Y-%m-%d %H:%M")
         db = get_db()
         db.execute("""INSERT INTO tickets
             (title, description, category, priority, status, requester, assigned_to, created_at, updated_at)
             VALUES (?,?,?,?,?,?,?,?,?)""", (
-            request.form["title"],
-            request.form["description"],
-            request.form["category"],
-            request.form["priority"],
-            "Open",
-            request.form["requester"],
-            request.form.get("assigned_to", "Unassigned"),
-            now, now
+            title, description, category, priority, "Open",
+            requester, assigned_to, now, now
         ))
         db.commit()
         flash("Ticket created successfully.", "success")
@@ -154,21 +175,25 @@ def view_ticket(ticket_id):
 
 @app.route("/ticket/<int:ticket_id>/update", methods=["POST"])
 def update_ticket(ticket_id):
-    db  = get_db()
-    now = datetime.now().strftime("%Y-%m-%d %H:%M")
-    new_status = request.form.get("status")
-    resolved_at = now if new_status == "Resolved" else None
+    db = get_db()
+    ticket = db.execute("SELECT id FROM tickets WHERE id=?", (ticket_id,)).fetchone()
+    if not ticket:
+        flash("Ticket not found.", "danger")
+        return redirect(url_for("index"))
 
+    new_status = request.form.get("status", "")
+    priority = request.form.get("priority", "")
+    assigned_to = request.form.get("assigned_to", "").strip() or "Unassigned"
+    if new_status not in STATUSES or priority not in PRIORITIES or len(assigned_to) > 100:
+        flash("Choose a valid status and priority, and keep the assignee under 100 characters.", "danger")
+        return redirect(url_for("view_ticket", ticket_id=ticket_id))
+
+    now = datetime.now().strftime("%Y-%m-%d %H:%M")
+    resolved_at = now if new_status == "Resolved" else None
     db.execute("""UPDATE tickets SET
-        status=?, priority=?, assigned_to=?, updated_at=?,
-        resolved_at=COALESCE(resolved_at, ?)
+        status=?, priority=?, assigned_to=?, updated_at=?, resolved_at=?
         WHERE id=?""", (
-        new_status,
-        request.form.get("priority"),
-        request.form.get("assigned_to"),
-        now,
-        resolved_at,
-        ticket_id
+        new_status, priority, assigned_to, now, resolved_at, ticket_id
     ))
     db.commit()
     flash("Ticket updated.", "success")
@@ -176,10 +201,23 @@ def update_ticket(ticket_id):
 
 @app.route("/ticket/<int:ticket_id>/comment", methods=["POST"])
 def add_comment(ticket_id):
-    db  = get_db()
+    db = get_db()
+    ticket = db.execute("SELECT id FROM tickets WHERE id=?", (ticket_id,)).fetchone()
+    if not ticket:
+        flash("Ticket not found.", "danger")
+        return redirect(url_for("index"))
+
+    author = request.form.get("author", "").strip()
+    body = request.form.get("body", "").strip()
+    if not author or len(author) > 100 or not body or len(body) > 2000:
+        flash("Enter your name and a comment of up to 2,000 characters.", "danger")
+        return redirect(url_for("view_ticket", ticket_id=ticket_id))
+
     now = datetime.now().strftime("%Y-%m-%d %H:%M")
-    db.execute("INSERT INTO comments (ticket_id, author, body, created_at) VALUES (?,?,?,?)",
-               (ticket_id, request.form["author"], request.form["body"], now))
+    db.execute(
+        "INSERT INTO comments (ticket_id, author, body, created_at) VALUES (?,?,?,?)",
+        (ticket_id, author, body, now),
+    )
     db.execute("UPDATE tickets SET updated_at=? WHERE id=?", (now, ticket_id))
     db.commit()
     return redirect(url_for("view_ticket", ticket_id=ticket_id))
@@ -198,4 +236,4 @@ if __name__ == "__main__":
     init_db()
     print("\n  IT Helpdesk Dashboard")
     print("  Running at http://localhost:5000\n")
-    app.run(debug=True, port=5000)
+    app.run(host="127.0.0.1", debug=False, port=5000)

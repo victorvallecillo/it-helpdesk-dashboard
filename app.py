@@ -176,7 +176,9 @@ def view_ticket(ticket_id):
 @app.route("/ticket/<int:ticket_id>/update", methods=["POST"])
 def update_ticket(ticket_id):
     db = get_db()
-    ticket = db.execute("SELECT id FROM tickets WHERE id=?", (ticket_id,)).fetchone()
+    ticket = db.execute(
+        "SELECT id, status, resolved_at FROM tickets WHERE id=?", (ticket_id,)
+    ).fetchone()
     if not ticket:
         flash("Ticket not found.", "danger")
         return redirect(url_for("index"))
@@ -189,7 +191,12 @@ def update_ticket(ticket_id):
         return redirect(url_for("view_ticket", ticket_id=ticket_id))
 
     now = datetime.now().strftime("%Y-%m-%d %H:%M")
-    resolved_at = now if new_status == "Resolved" else None
+    if new_status == "Resolved":
+        resolved_at = ticket["resolved_at"] if ticket["status"] == "Resolved" else now
+    elif new_status == "Closed" and ticket["status"] == "Resolved":
+        resolved_at = ticket["resolved_at"]
+    else:
+        resolved_at = None
     db.execute("""UPDATE tickets SET
         status=?, priority=?, assigned_to=?, updated_at=?, resolved_at=?
         WHERE id=?""", (

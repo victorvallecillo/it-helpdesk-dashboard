@@ -95,8 +95,8 @@
       {% endif %}
 
       <form method="post" action="/ticket/{{ ticket.id }}/comment" style="margin-top:20px;border-top:1px solid #F1F5F9;padding-top:16px">
-        <input type="text" name="author" placeholder="Your name" required>
-        <textarea name="body" placeholder="Add a comment or update..." required></textarea>
+        <input type="text" name="author" maxlength="100" placeholder="Your name" required>
+        <textarea name="body" maxlength="2000" placeholder="Add a comment or update..." required></textarea>
         <button type="submit" class="btn btn-primary">Add Comment</button>
       </form>
     </div>
@@ -120,7 +120,7 @@
           {% endfor %}
         </select>
         <div class="field-label">Assigned To</div>
-        <input type="text" name="assigned_to" value="{{ ticket.assigned_to }}">
+        <input type="text" name="assigned_to" maxlength="100" value="{{ ticket.assigned_to }}">
         <button type="submit" class="btn btn-primary" style="width:100%">Update</button>
       </form>
     </div>
